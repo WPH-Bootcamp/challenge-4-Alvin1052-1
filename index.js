@@ -1,7 +1,7 @@
 /**
  * Main Application - CLI Interface
  * File ini adalah entry point aplikasi
- * 
+ *
  * TODO: Implementasikan CLI interface yang interaktif dengan menu:
  * 1. Tambah Siswa Baru
  * 2. Lihat Semua Siswa
@@ -14,8 +14,25 @@
  */
 
 import readlineSync from 'readline-sync';
-import Student from './src/Student.js';
 import StudentManager from './src/StudentManager.js';
+import Student from './src/Student.js';
+let countId = 1;
+
+function AskString(question) {
+  let answer;
+  do {
+    answer = readlineSync.question(question);
+  } while (answer === '');
+  return answer;
+}
+
+function AskNumber(question) {
+  let answer;
+  do {
+    answer = readlineSync.question(question);
+  } while (isNaN(answer) === true || answer === '');
+  return Number(answer);
+}
 
 // Inisialisasi StudentManager
 const manager = new StudentManager();
@@ -34,7 +51,9 @@ function displayMenu() {
   console.log('5. Hapus Siswa');
   console.log('6. Tambah Nilai Siswa');
   console.log('7. Lihat Top 3 Siswa');
-  console.log('8. Keluar');
+  console.log('8. Daftar Siswa Berdasarkan Kelas');
+  console.log('9. Statistik Berdasarkan Kelas');
+  console.log('0. Keluar');
   console.log('=================================');
 }
 
@@ -49,6 +68,12 @@ function displayMenu() {
 function addNewStudent() {
   // Implementasi di sini
   console.log('\n--- Tambah Siswa Baru ---');
+  const idAdd = String(countId++);
+  const nameAdd = AskString('Masukkan Nama siswa: ');
+  const classAdd = AskString('Masukkan Kelas siswa: ');
+
+  manager.addStudent(new Student(idAdd, nameAdd, classAdd));
+
   // TODO: Lengkapi implementasi
 }
 
@@ -61,6 +86,10 @@ function addNewStudent() {
 function viewAllStudents() {
   // Implementasi di sini
   console.log('\n--- Daftar Semua Siswa ---');
+  if (manager.getAllStudents().length === 0)
+    return console.log('Tidak ada siswa!');
+  manager.getAllStudents().forEach((student) => student.displayInfo());
+
   // TODO: Lengkapi implementasi
 }
 
@@ -74,6 +103,13 @@ function viewAllStudents() {
 function searchStudent() {
   // Implementasi di sini
   console.log('\n--- Cari Siswa ---');
+  const id = AskNumber('Masukkan ID siswa: ');
+
+  const data = manager.findStudent(id);
+
+  if (!data) return console.log('Siswa tidak ditemukan!');
+  data.displayInfo();
+  // manager.findStudent(id).displayInfo();
   // TODO: Lengkapi implementasi
 }
 
@@ -88,6 +124,16 @@ function searchStudent() {
 function updateStudent() {
   // Implementasi di sini
   console.log('\n--- Update Data Siswa ---');
+
+  const id = AskNumber('Masukkan ID siswa: ');
+
+  if (!manager.findStudent(id)) return console.log('Siswa tidak ditemukan!');
+
+  manager.findStudent(id).displayInfo();
+  const name = AskString('Masukkan Nama baru: ');
+  const kelas = AskString('Masukkan Kelas baru: ');
+  manager.updateStudent(id, { name, kelas });
+
   // TODO: Lengkapi implementasi
 }
 
@@ -101,6 +147,8 @@ function updateStudent() {
 function deleteStudent() {
   // Implementasi di sini
   console.log('\n--- Hapus Siswa ---');
+  const id = AskNumber('Masukkan ID siswa: ');
+  manager.removeStudent(id);
   // TODO: Lengkapi implementasi
 }
 
@@ -115,6 +163,15 @@ function deleteStudent() {
 function addGradeToStudent() {
   // Implementasi di sini
   console.log('\n--- Tambah Nilai Siswa ---');
+
+  const id = AskString('Masukkan ID siswa: ');
+
+  if (!manager.findStudent(id)) return console.log('Siswa tidak ditemukan!');
+
+  const subject = AskString('Masukkan Mata Pelajaran: ');
+  const score = AskNumber('Masukkan Nilai: ');
+
+  manager.findStudent(id).addGrade(subject, score);
   // TODO: Lengkapi implementasi
 }
 
@@ -127,9 +184,23 @@ function addGradeToStudent() {
 function viewTopStudents() {
   // Implementasi di sini
   console.log('\n--- Top 3 Siswa ---');
+
+  manager.getTopStudents(3).forEach((student) => student.displayInfo());
   // TODO: Lengkapi implementasi
 }
 
+function getStudentsByClassname() {
+  // Implementasi di sini
+  if (manager.getAllStudents().length === 0)
+    return console.log('Tidak ada siswa!');
+  console.log('\n--- Daftar Siswa Berdasarkan Kelas ---');
+  const classInput = AskString('Masukkan Kelas: ');
+  manager
+    .getStudentsByClass(classInput)
+    .forEach((student) => student.displayInfo());
+
+  // TODO: Lengkapi implementasi
+}
 /**
  * Main program loop
  * TODO: Implementasikan main loop
@@ -138,21 +209,70 @@ function viewTopStudents() {
  * - Panggil handler yang sesuai
  * - Ulangi sampai user pilih keluar
  */
+
+function getClassStats() {
+  console.log('\n--- Kelas Statistik ---');
+  const classInput = AskString('Masukkan Kelas: ');
+  const data = manager.getClassStatistics(classInput);
+
+  console.log(
+    `Jumlah siswa dalam kelas ${classInput}: ${data.numberOfStudents}`
+  );
+  console.log(`Rata-rata kelas ${classInput}: ${data.average}`);
+}
 function main() {
   console.log('Selamat datang di Sistem Manajemen Nilai Siswa!');
-  
+
   // TODO: Implementasikan loop utama program
   let running = true;
-  
+
   while (running) {
-    // Tampilkan menu
-    // Baca pilihan user
-    // Jalankan action sesuai pilihan
-    // TODO: Lengkapi implementasi
-    
-    // Hint: gunakan switch-case untuk handle berbagai pilihan
+    displayMenu();
+
+    const pilihan = readlineSync.question('Pilih menu (1-8): ');
+
+    switch (pilihan) {
+      case '1':
+        addNewStudent();
+        break;
+      case '2':
+        viewAllStudents();
+        break;
+      case '3':
+        searchStudent();
+        break;
+      case '4':
+        updateStudent();
+        break;
+      case '5':
+        deleteStudent();
+        break;
+      case '6':
+        addGradeToStudent();
+        break;
+      case '7':
+        viewTopStudents();
+        break;
+      case '8':
+        getStudentsByClassname();
+        break;
+      case '9':
+        getClassStats();
+        break;
+      case '0':
+        running = false;
+        break;
+      default:
+        console.log('Pilihan tidak valid. Silakan pilih lagi.');
+    }
+    //   // Tampilkan menu
+    //   // Baca pilihan user
+    //   // Jalankan action sesuai pilihan
+    //   // TODO: Lengkapi implementasi
+
+    //   // Hint: gunakan switch-case untuk handle berbagai pilihan
   }
-  
+
   console.log('\nTerima kasih telah menggunakan aplikasi ini!');
 }
 
