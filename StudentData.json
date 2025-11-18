@@ -1,0 +1,30 @@
+{
+  "students": [
+    {
+      "id": "1",
+      "name": "alvinn",
+      "studentClass": "33",
+      "subjectScore": [
+        {
+          "subject": "Matematika",
+          "scoreNumber": 90
+        },
+        {
+          "subject": "90",
+          "scoreNumber": 90
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "jovii",
+      "studentClass": "33",
+      "subjectScore": [
+        {
+          "subject": "fisika",
+          "scoreNumber": 90
+        }
+      ]
+    }
+  ]
+}

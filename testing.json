@@ -1,0 +1,26 @@
+{
+  "student": [
+    {
+      "id": "1",
+      "name": "A",
+      "studentClass": "A",
+      "subjectScore": [
+        {
+          "subject": "Matematika",
+          "scoreNumber": 80
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "B",
+      "studentClass": "B",
+      "subjectScore": [
+        {
+          "subject": "Matematika",
+          "scoreNumber": 90
+        }
+      ]
+    }
+  ]
+}

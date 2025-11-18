@@ -16,6 +16,7 @@
 import readlineSync from 'readline-sync';
 import StudentManager from './src/StudentManager.js';
 import Student from './src/Student.js';
+
 let countId = 1;
 
 function AskString(question) {
@@ -169,7 +170,11 @@ function addGradeToStudent() {
   if (!manager.findStudent(id)) return console.log('Siswa tidak ditemukan!');
 
   const subject = AskString('Masukkan Mata Pelajaran: ');
-  const score = AskNumber('Masukkan Nilai: ');
+
+  let score;
+  do {
+    score = AskNumber('Masukkan Nilai: ');
+  } while (score < 0 || score > 100);
 
   manager.findStudent(id).addGrade(subject, score);
   // TODO: Lengkapi implementasi
@@ -225,11 +230,13 @@ function main() {
 
   // TODO: Implementasikan loop utama program
   let running = true;
+  manager.loadFile();
 
   while (running) {
+    manager.saveToFile();
     displayMenu();
 
-    const pilihan = readlineSync.question('Pilih menu (1-8): ');
+    const pilihan = readlineSync.question('Pilih menu (0-9): ');
 
     switch (pilihan) {
       case '1':
@@ -265,6 +272,7 @@ function main() {
       default:
         console.log('Pilihan tidak valid. Silakan pilih lagi.');
     }
+
     //   // Tampilkan menu
     //   // Baca pilihan user
     //   // Jalankan action sesuai pilihan

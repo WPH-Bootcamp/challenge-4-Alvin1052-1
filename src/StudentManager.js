@@ -14,6 +14,13 @@
  */
 
 import Student from './Student.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+export const DATA_FILE = path.join(__dirname, '..', 'StudentData.json');
 
 class StudentManager {
   // TODO: Implementasikan constructor
@@ -157,6 +164,37 @@ class StudentManager {
       numberOfStudents,
       average,
     };
+  }
+  saveToFile() {
+    const data = {
+      students: this.students.map((student) => ({
+        id: student.id,
+        name: student.name,
+        studentClass: student.studentClass,
+        subjectScore: student.subjectScore.map((subject) => ({
+          subject: subject.subject,
+          scoreNumber: subject.scoreNumber,
+        })),
+      })),
+    };
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  }
+
+  loadFile() {
+    const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    console.log('data', data);
+    if (!data) return console.log('Data tidak ditemukan!');
+    this.students = data.students.map((student) => {
+      const newStudent = new Student(
+        student.id,
+        student.name,
+        student.studentClass
+      );
+      student.subjectScore.forEach((subject) => {
+        newStudent.addGrade(subject.subject, subject.scoreNumber);
+      });
+      return newStudent;
+    });
   }
 }
 
